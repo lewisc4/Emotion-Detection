@@ -10,7 +10,8 @@ It is necessary to have python >= 3.7 installed in order to run the code for thi
 
 1. Clone or download this project to your local computer.
 2. Navigate to the `code\` directory, where the `setup.py` file is located.
-3. Install the `emotion_detection` module and all dependencies by running the following command from the command line (required python modules can be found in `code\requirements.txt`): `pip install -e .`
+3. Install the `emotion_detection` module and all dependencies by running the following command from the command line: `pip install -e .` (required python modules can be found in `code\requirements.txt`).
+
 **GPU specific instructions:**
     1. If you are on a GPU machine, you need to install a GPU version of pytorch. To do that, first check what CUDA version your server has with `nvidia-smi`.
     2. If your CUDA version is below 10.2, don't use this server
