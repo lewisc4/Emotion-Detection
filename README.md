@@ -10,7 +10,7 @@ It is necessary to have python >= 3.7 installed in order to run the code for thi
 
 1. Clone or download this project to your local computer.
 2. Navigate to the `code\` directory, where the `setup.py` file is located.
-3. Install the `emotion_detection` module and all dependencies by running the following command from the command line: `pip install -e .`
+3. Install the `emotion_detection` module and all dependencies by running the following command from the command line (required python modules can be found in `code\requirements.txt`): `pip install -e .`
 **GPU specific instructions:**
     1. If you are on a GPU machine, you need to install a GPU version of pytorch. To do that, first check what CUDA version your server has with `nvidia-smi`.
     2. If your CUDA version is below 10.2, don't use this server
@@ -32,4 +32,12 @@ The available hyperparameters for fine-tuning the ResNet model can be found in t
 * `num_train_epochs` <- Number of training epochs to use
 
 ### CLI Commands
+**Make sure you have followed the `Setting Up The Environment` section before running these commands**
 
+The below commands can be run from the `cli` directory. By default, the model is saved to the `code/cli/outputs/` directory. If the provided `output_dir` does not exist, it will automatically be created.
+
+**To train a model that perfectly fits a small set of training examples:**
+
+**To train a model with the parameters that achieved the best accuracy:**
+
+**To perform wandb sweeps using the `sweep.yaml` configuration file (make sure you have wandb project)**
