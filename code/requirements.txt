@@ -1,0 +1,9 @@
+datasets==2.0.0
+numpy==1.19.5
+Pillow==9.3.0
+setuptools==42.0.2
+torch==1.13.0
+torchvision==0.14.0
+tqdm==4.62.3
+transformers==4.20.0
+wandb==0.12.10
