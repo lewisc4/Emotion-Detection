@@ -1,8 +1,7 @@
 # Emotion Detection Using Deep Learning
-Fine-tuning a residual neural network to classify human emotions based on images of human faces.
 
 ## Project Overview
-In this project, a pre-trained [ResNet model](https://arxiv.org/pdf/1512.03385.pdf), specifically [this implementation](https://huggingface.co/microsoft/resnet-18), is fine-tuned on the [FER-2013 dataset](https://www.kaggle.com/datasets/msambare/fer2013) to classify 7 human emotions. It is shown that this fine-tuned model achieves higher accuracies than several baseline models as well as a higher accuracy than human evaluations. The training results and metrics for this project were primarily tracked using [wandb](https://wandb.ai/site) and the associated training runs can be found [here](https://wandb.ai/clewis7744/emotion_detection).
+In this project, a pre-trained [ResNet model](https://arxiv.org/pdf/1512.03385.pdf) (specifically [this implementation](https://huggingface.co/microsoft/resnet-18)), was fine-tuned on the [FER-2013 dataset](https://www.kaggle.com/datasets/msambare/fer2013) to classify 7 human emotions based on images of human faces. It is shown that this fine-tuned model achieves higher accuracies than several baseline models as well as a higher accuracy than human evaluations. The training results and metrics for this project were primarily tracked using [wandb](https://wandb.ai/site) and the associated training runs can be found [here](https://wandb.ai/clewis7744/emotion_detection).
 
 ## Setting Up The Environment
 ### Package Installation
