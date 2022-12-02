@@ -1,4 +1,4 @@
-# Emotion-Detection Usind Deep Learning
+# Emotion-Detection Using Deep Learning
 Fine-tuning a residual neural network to classify human emotions based on images of human faces.
 
 ## Project Overview
