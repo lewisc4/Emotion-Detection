@@ -39,7 +39,8 @@ class FERDataset(VisionDataset):
 	_RESOURCES = {
 		'train': 'train.csv',
 		'val': 'train.csv',
-		'test': 'test.csv',
+		'public_test': 'public_test.csv',
+		'private_test': 'private_test.csv',
 	}
 
 	def __init__(self, root, split='train', transform=None, target_transform=None, sample_size=None):
@@ -56,6 +57,7 @@ class FERDataset(VisionDataset):
 		# Verify our full file path and sample from the file if it is valid
 		self.verify_data_file()
 		self.sample_data_file()
+		self.set_targets()
 
 
 	def __len__(self):
@@ -97,6 +99,14 @@ class FERDataset(VisionDataset):
 			self._samples = [self.sample(row) for row in sampler]
 
 
+	def set_targets(self):
+		''' Get all of the dataset targets, regardless of sample size. '''
+		sample_size = sum(1 for line in open(self._data_file))
+		with open(self._data_file, 'r', newline='') as in_file:
+			sampler = islice(csv.DictReader(in_file), sample_size)
+			self.targets = [self.sample(row)[1] for row in sampler]
+
+
 	def sample(self, row):
 		''' Samples a single row in our data file, returns the image and its label '''
 		pixels = [int(idx) for idx in row['pixels'].split()]
@@ -108,6 +118,11 @@ class FERDataset(VisionDataset):
 	def extra_repr(self):
 		''' Returns the dataset's split type, either train (default) or test '''
 		return f'split={self._split}'
+
+
+	def indices_to_classes(self, indices):
+		''' Maps prediction indices to class id. '''
+		return [self.targets[idx] for idx in indices]
 
 
 	def class_distribution(self):

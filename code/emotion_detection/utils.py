@@ -19,7 +19,7 @@ def parse_args():
 	
 	Default arguments have the meaning of being a reasonable default value, not of the last arguments used.
 	"""
-	parser = argparse.ArgumentParser(description="Train machine translation transformer model")
+	parser = argparse.ArgumentParser(description="Fine-tune image classification model")
 
 	# Required arguments
 	parser.add_argument(
@@ -51,6 +51,13 @@ def parse_args():
 		default=False,
 		action="store_true",
 		help="Use the test set for validation. By default, a subset of training data is used.",
+	)
+	parser.add_argument(
+		"--test_type",
+		type=str,
+		default="public_test",
+		help="The testing data split type to use.",
+		choices=["public_test", "private_test"],
 	)
 	parser.add_argument(
 		"--train_val_size",
@@ -151,7 +158,7 @@ def parse_args():
 	# Weights and biases (wandb) arguments
 	parser.add_argument(
 		"--use_wandb",
-		default=True,
+		default=False,
 		action="store_true",
 		help="Whether to enable usage/logging for the wandb_project.",
 	)
