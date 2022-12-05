@@ -27,9 +27,9 @@ logging.basicConfig(
 accuracy = load_metric('accuracy')
 
 
-def get_dataloaders(feature_extractor, args):
+def get_model_data(feature_extractor, args):
 	'''
-	Gets train/validation dataloaders, given a model's feature extractor
+	Gets train/validation datasets and dataloaders, given a model's feature extractor
 	Args:
 		feature_extractor: The pre-trained models's feature extractor
 		args: The set of arguments used to run this script
@@ -43,7 +43,7 @@ def get_dataloaders(feature_extractor, args):
 	)
 	# Determine validation split and validation sample size based on if we are
 	# using the test set or a subset of the training set as validation data
-	val_split = 'test' if args.test_for_val else 'val'
+	val_split = args.test_type if args.test_for_val else 'val'
 	val_sample_size = args.test_size if args.test_for_val else args.train_val_size
 	# Get the validation dataset
 	val_data = FERDataset(
@@ -70,7 +70,10 @@ def get_dataloaders(feature_extractor, args):
 		sampler=val_sampler,
 		shuffle=False
 	)
-	return {'train': train_dataloader, 'validation': val_dataloader}
+
+	dsets = {'train': train_data, 'validation': val_data}
+	dloaders = {'train': train_dataloader, 'validation': val_dataloader}
+	return dsets, dloaders
 
 
 def evaluate_model(model, dataloader, args):
@@ -82,8 +85,9 @@ def evaluate_model(model, dataloader, args):
 		args: The set of arguments used to run this script
 	'''
 	model.eval()
-	eval_loss = 0.0
+	loss = 0.0
 
+	eval_labels, eval_preds = [], []
 	for inputs, labels in tqdm(dataloader, desc='Evaluation'):
 		with torch.inference_mode():
 			inputs = inputs.to(args.device)
@@ -91,16 +95,21 @@ def evaluate_model(model, dataloader, args):
 			
 			model_output = model(pixel_values=inputs, labels=labels)
 			logits = model_output.logits.to(args.device)
-			eval_loss += model_output.loss.to(args.device)
+			loss += model_output.loss.to(args.device)
 
-			eval_preds = logits.argmax(-1).to(args.device)
-			accuracy.add_batch(predictions=eval_preds, references=labels)
+			preds = logits.argmax(-1).to(args.device)
+			accuracy.add_batch(predictions=preds, references=labels)
+
+			eval_labels += labels.tolist()
+			eval_preds += preds.tolist()
 
 	model.train()
-	return accuracy.compute()['accuracy'], eval_loss / len(dataloader.dataset)
+	eval_accuracy = accuracy.compute()['accuracy']
+	eval_loss = loss / len(dataloader.dataset)
+	return eval_accuracy, eval_loss, eval_labels, eval_preds
 
 
-def train_model(model, train_dataloader, eval_dataloader, optimizer, scheduler, args):
+def train_model(model, train_dataloader, eval_dataloader, optimizer, scheduler, eval_dataset, args):
 	'''
 	Train (fine-tune) a pre-trained model
 	Args:
@@ -169,7 +178,7 @@ def train_model(model, train_dataloader, eval_dataloader, optimizer, scheduler, 
 			# Evaluation step count reached, log our validation set accuracy and loss
 			if global_step % args.eval_every_steps == 0 or global_step == args.max_train_steps:
 				# Evaluate the current model using the evaluation dataloader
-				eval_accuracy, eval_loss = evaluate_model(
+				eval_accuracy, eval_loss, eval_labels, eval_preds = evaluate_model(
 					model=model,
 					dataloader=eval_dataloader,
 					args=args
@@ -185,10 +194,22 @@ def train_model(model, train_dataloader, eval_dataloader, optimizer, scheduler, 
 					f' - Val Accuracy: {eval_accuracy}, Val Loss: {eval_loss}'
 				)
 				if args.use_wandb:
+					# Log eval accuracy and loss
 					wandb.log(
 						{'eval_accuracy': eval_accuracy, 'eval_loss': eval_loss},
 						step=global_step,
 					)
+					# Log eval cofusion matrix if eval accuracy improved
+					if eval_accuracy > best_eval_accuracy:
+						wandb.log(
+							{
+								'conf_mat': wandb.plot.confusion_matrix(
+									y_true=eval_labels,
+									preds=eval_dataset.indices_to_classes(eval_preds),
+									class_names=list(eval_dataset.CLASSES.values())
+								)
+							}
+						)
 
 			# Checkpoing step count reached, save the current model checkpoint
 			if global_step % args.checkpoint_every_steps == 0:
@@ -233,9 +254,11 @@ def main():
 		args.percent_train = 1.0
 
 	# Get the dataloaders (training/validation/testing) for the FER-2013 dataset
-	dataloaders = get_dataloaders(feature_extractor, args)
-	train_dataloader = dataloaders['train']
-	eval_dataloader = dataloaders['validation']
+	dsets, dloaders = get_model_data(feature_extractor, args)
+	train_dataset = dsets['train']
+	eval_dataset = dsets['validation']
+	train_dataloader = dloaders['train']
+	eval_dataloader = dloaders['validation']
 
 	# If in debug mode, use training set as eval set (to check if we can overfit)
 	if args.debug:
@@ -260,7 +283,6 @@ def main():
 		lr=args.learning_rate,
 		weight_decay=args.weight_decay
 	)
-
 	# transformers.SchedulerType
 	if args.lr_scheduler_type == 'no_scheduler':
 		scheduler = None
@@ -285,6 +307,7 @@ def main():
 		eval_dataloader=eval_dataloader,
 		optimizer=optimizer,
 		scheduler=scheduler,
+		eval_dataset=eval_dataset,
 		args=args
 	)
 
