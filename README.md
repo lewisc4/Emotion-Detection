@@ -1,4 +1,4 @@
-# Emotion Detection Using Deep Learning
+# Facial Expression Recognition Using Deep Learning
 
 ## Project Overview
 In this project, a pre-trained [ResNet model](https://arxiv.org/pdf/1512.03385.pdf) (specifically [this implementation](https://huggingface.co/microsoft/resnet-18)), was fine-tuned on the [FER-2013 dataset](https://www.kaggle.com/datasets/msambare/fer2013) to classify 7 human emotions based on images of human faces. It is shown that this fine-tuned model achieves higher accuracies than several baseline models as well as a higher accuracy than human evaluations. The training results and metrics for this project were primarily tracked using [wandb](https://wandb.ai/site) and all associated training runs can be found [here](https://wandb.ai/clewis7744/emotion_detection), with the best training run being [here](https://wandb.ai/clewis7744/emotion_detection/runs/3jct8bsf).
