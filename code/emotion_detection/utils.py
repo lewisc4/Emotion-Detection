@@ -3,7 +3,7 @@ import torch
 import numpy as np
 
 from torchvision import transforms
-from torch.utils.data.sampler import SubsetRandomSampler
+from torch.utils.data.sampler import SubsetRandomSampler, WeightedRandomSampler
 
 
 def parse_args():
@@ -215,9 +215,22 @@ def get_train_val_samplers(dataset, args):
 	Samplers should then be used in the respective training/validation dataloaders.
 	If the test set is used as the validation set, there is no need to use samplers. 
 	'''
-	# If using the test set for validation, do no samplers are needed
+	# If using the test set for validation, use a weighted sampler for the training set
+	# and do not use a sampler for the validation set
 	if args.test_for_val:
-		return None, None
+		# Don't use a weighted sampler if we are using a subset of the training data
+		if args.train_val_size is not None:
+			return None, None
+		tgts = dataset.targets
+		class_counts = np.array([len(np.where(tgts == t)[0]) for t in np.unique(tgts)])
+		weight = 1. / class_counts
+		samples_weight = np.array([weight[t] for t in tgts])
+
+		samples_weight = torch.from_numpy(samples_weight)
+		samples_weight = samples_weight.double()
+		train_sampler = WeightedRandomSampler(samples_weight, len(samples_weight))
+		return train_sampler, None
+
 	# Get the training and validation splits
 	dataset_size = len(dataset)
 	dataset_indices = list(range(dataset_size))
