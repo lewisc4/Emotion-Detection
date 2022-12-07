@@ -46,8 +46,10 @@ The available hyperparameters for fine-tuning the ResNet model can be found in t
 The below commands can be run from the `cli` directory. By default, the model is saved to the `code/cli/outputs/` directory. If the provided `output_dir` does not exist, it will automatically be created.
 
 **To train a model with the parameters that achieved the best accuracy:**
+
 `python3 train.py --test_for_val --test_type='public_test' --pretrained_model_name='microsoft/resnet-50' --batch_size=64 --learning_rate=1e-3 --lr_scheduler_type='linear' --weight_decay=0.0 --num_train_epochs=30 --eval_every_steps=90 --logging_steps=90 --checkpoint_every_steps=10000 --seed=42 --use_wandb`
 
 **To perform wandb sweeps using the `sweep.yaml` configuration file (make sure you have set a wandb project using the wandb_project argument):**
-`wandb sweep --project emotion_detection sweep.yaml`
-`wandb agent wandb_username/emotion_detection/sweep_id`
+
+1. `wandb sweep --project emotion_detection sweep.yaml`
+2. `wandb agent wandb_username/emotion_detection/sweep_id`
