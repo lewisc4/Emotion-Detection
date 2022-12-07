@@ -178,6 +178,7 @@ def train_model(model, train_dataloader, eval_dataloader, optimizer, scheduler, 
 			# Evaluation step count reached, log our validation set accuracy and loss
 			if global_step % args.eval_every_steps == 0 or global_step == args.max_train_steps:
 				# Evaluate the current model using the evaluation dataloader
+				# Labels and preds can be used for plots such as confusion matrices, etc.
 				eval_accuracy, eval_loss, eval_labels, eval_preds = evaluate_model(
 					model=model,
 					dataloader=eval_dataloader,
@@ -199,17 +200,6 @@ def train_model(model, train_dataloader, eval_dataloader, optimizer, scheduler, 
 						{'eval_accuracy': eval_accuracy, 'eval_loss': eval_loss},
 						step=global_step,
 					)
-					# Log eval cofusion matrix if eval accuracy improved
-					if eval_accuracy == best_eval_accuracy:
-						wandb.log(
-							{
-								'conf_mat': wandb.plot.confusion_matrix(
-									y_true=eval_labels,
-									preds=eval_dataset.indices_to_classes(eval_preds),
-									class_names=list(eval_dataset.CLASSES.values())
-								)
-							}
-						)
 
 			# Checkpoing step count reached, save the current model checkpoint
 			if global_step % args.checkpoint_every_steps == 0:
