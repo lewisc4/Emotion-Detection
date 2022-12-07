@@ -200,7 +200,7 @@ def train_model(model, train_dataloader, eval_dataloader, optimizer, scheduler, 
 						step=global_step,
 					)
 					# Log eval cofusion matrix if eval accuracy improved
-					if eval_accuracy > best_eval_accuracy:
+					if eval_accuracy == best_eval_accuracy:
 						wandb.log(
 							{
 								'conf_mat': wandb.plot.confusion_matrix(
