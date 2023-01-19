@@ -12,13 +12,14 @@ It is necessary to have python >= 3.7 installed in order to run the code for thi
 3. Install the `emotion_detection` module and all dependencies by running the following command from the CLI: `pip install -e .` (required python modules are in `requirements.txt`).
  
 ### GPU-related Requirements/Installations
+Follow the steps below to ensure your GPU and all relevant libraries up to date and in good standing.
+
 1. If you are on a GPU machine, you need to install a GPU version of pytorch. To do that, first check what CUDA version your server has with `nvidia-smi`.
 2. If your CUDA version is below 10.2, don't use this server
 3. If your CUDA version is below 11, run `pip install torch`
 4. Else, `pip install torch==1.10.2+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html`
 5. Check that pytorch-GPU works via `python -c "import torch; print(torch.cuda.is_available())"`. If it returns False, reinstall pytorch via one of the above command (usually this helps).
 6. If you are using 30XX, A100 or A6000 GPU, you have to use CUDA 11.3 and above.
-
 
 ### Downloading The Dataset
 The dataset can be downloaded from [here](https://www.kaggle.com/competitions/challenges-in-representation-learning-facial-expression-recognition-challenge/data?select=fer2013.tar.gz). Specifically, the `fer2013.tar.gz` file should be downloaded and unzipped/extracted. It contains all of the training and testing examples in one `.csv` file under `fer2013/fer2013.csv`.
