@@ -7,7 +7,8 @@ from torch.utils.data.sampler import SubsetRandomSampler, WeightedRandomSampler
 
 
 def parse_args():
-	"""This function creates argument parser and parses the scrip input arguments.
+	'''
+	This function creates argument parser and parses the scrip input arguments.
 	This is the most common way to define input arguments in python. It is used
 	by train.py and human_eval.py
 
@@ -18,7 +19,7 @@ def parse_args():
 		--weight_decay 0.01
 	
 	Default arguments have the meaning of being a reasonable default value, not of the last arguments used.
-	"""
+	'''
 	parser = argparse.ArgumentParser(description="Fine-tune image classification model")
 
 	# Required arguments
