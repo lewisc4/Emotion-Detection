@@ -3,13 +3,13 @@
 ## Project Overview
 In this project, a pre-trained [ResNet model](https://arxiv.org/pdf/1512.03385.pdf) (specifically [this implementation](https://huggingface.co/microsoft/resnet-18)), was fine-tuned on the [FER-2013 dataset](https://www.kaggle.com/datasets/msambare/fer2013) to classify 7 human emotions based on images of human faces. It is shown that this fine-tuned model achieves higher accuracies than several baseline models as well as a higher accuracy than human evaluations. The training results and metrics for this project were primarily tracked using [wandb](https://wandb.ai/site) and all associated training runs can be found [here](https://wandb.ai/clewis7744/emotion_detection), with the best training run being [here](https://wandb.ai/clewis7744/emotion_detection/runs/3jct8bsf).
 
-## Setting Up The Environment
+## Environment Setup
 ### Package Installation
 It is necessary to have python >= 3.7 installed in order to run the code for this project. In order to install the necessary libraries and modules follow the below instructions.
 
 1. Clone or download this project to your local computer.
 2. Navigate to the [root directory](https://github.com/lewisc4/Emotion-Detection), where the [`setup.py`](/setup.py) file is located.
-3. Install the [`emotion_detection`](/emotion_detection) module and all dependencies by running the following command from the CLI: `pip install -e .` (required python modules are in [`requirements.txt`](/requirements.txt)).
+3. Install the [`emotion_detection`](/emotion_detection) module and all dependencies by running the following command: `pip install -e .` (required python modules are in [`requirements.txt`](/requirements.txt)).
  
 ### GPU-related Requirements/Installations
 Follow the steps below to ensure your GPU and all relevant libraries are up to date and in good standing.
@@ -26,12 +26,14 @@ The dataset can be downloaded from [here](https://www.kaggle.com/competitions/ch
 
 After the dataset has been downloaded, you can run `python3 make_datasets.py` to extract the training and testing files. By default, the Kaggle dataset should be downloaded and unzipped in the [`cli`](/cli) directory. However, you can override this via the script's `--input_data_dir` argument. By default, the output files will be stored in the `cli/dataset/fer2013` folder, which contains the `train.csv`, `public_test.csv`, and `private_test.csv`. However, you can override this via the script's `--output_data_dir` argument. After the `cli/dataset/fer2013` folder and files have been created, the downloaded dataset is no longer needed and the training script can be run (see below).
 
-## Training A Model
+## Training
+The [`train.py`](/cli/train.py) script is used to train a model and save it to a specified directory, which is created if it doesn't exist.
+
 ### Hyperparameters
-The available hyperparameters for fine-tuning the ResNet model can be found in [`emotion_detection/utils.py`](/emotion_detection/utils.py). By default, a large majority of the hyperparameters are inherited from the ResNet model's original parameters. The default model is `microsoft/resnet-18`. Useful parameters to change/test with are:
+The available hyperparameters for fine-tuning the ResNet model can be found in [`utils.py`](/emotion_detection/utils.py). By default, a large majority of the hyperparameters are inherited from the ResNet model's original parameters. The default model is `microsoft/resnet-18`. Useful parameters to change/test with are:
 
 * `data_dir` <- Folder where the dataset is stored (`cli/dataset/` by default). See [**Downloading The Dataset**](https://github.com/lewisc4/Emotion-Detection/blob/main/README.md#downloading-the-dataset) for more.
-* `output_dir` <- Where to save the model to (defaults to `cli/outputs/`)
+* `output_dir` <- Where to save the model (created if it doesn't exist)
 * `test_for_val` <- Whether to use the test set for validation or not. If not, a subset of the training data is used.
 * `test_type` <- Uses either public test set (`public_test.csv`) or the private test set (`private_test.csv`) if the test set is used for validation.
 * `percent_train` <- What percentage of the training dataset should be used for training, if a subset is used as a validation set.
@@ -44,16 +46,10 @@ The available hyperparameters for fine-tuning the ResNet model can be found in [
 * `wandb_project` <- The weights and biases project to use (not required)
 * `use_wandb` <- Whether to log to weights and biases or not (do not use unless you have a project set via `wandb_project`)
 
-### CLI Training Commands
-**You must complete the steps in [**Setting Up The Environment**](https://github.com/lewisc4/Emotion-Detection/blob/main/README.md#setting-up-the-environment) before running these commands**
-
-The below commands can be run from the [`cli`](/cli) directory. By default, the model is saved to `cli/outputs/`. If the provided `output_dir` does not exist, it will automatically be created.
-
+### Example Usage
 **To train a model with the parameters that achieved the best accuracy:**
-
-`python3 train.py --test_for_val --test_type='public_test' --pretrained_model_name='microsoft/resnet-50' --batch_size=64 --learning_rate=1e-3 --lr_scheduler_type='linear' --weight_decay=0.0 --num_train_epochs=30 --eval_every_steps=90 --logging_steps=90 --checkpoint_every_steps=10000 --seed=42`
+- `python3 train.py --test_for_val --test_type='public_test' --pretrained_model_name='microsoft/resnet-50' --batch_size=64 --learning_rate=1e-3 --lr_scheduler_type='linear' --weight_decay=0.0 --num_train_epochs=30 --eval_every_steps=90 --logging_steps=90 --checkpoint_every_steps=10000 --seed=42`
 
 **To perform wandb sweeps using the [`sweep.yaml`](/cli/sweep.yaml) configuration (you must set a wandb project via the `wandb_project` argument):**
-
 1. `wandb sweep --project emotion_detection sweep.yaml` <- Here `emotion_detection` is the wandb project name
 2. `wandb agent wandb_username/emotion_detection/sweep_id` <- Use the `sweep_id` returned by the above command
