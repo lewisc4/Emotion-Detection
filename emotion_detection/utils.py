@@ -1,3 +1,4 @@
+import os
 import argparse
 import torch
 import numpy as np
@@ -20,153 +21,200 @@ def parse_args():
 	
 	Default arguments have the meaning of being a reasonable default value, not of the last arguments used.
 	'''
-	parser = argparse.ArgumentParser(description="Fine-tune image classification model")
+	parser = argparse.ArgumentParser(description='Fine-tune image classification model')
 
 	# Required arguments
 	parser.add_argument(
-		"--data_dir",
+		'--data_dir',
 		type=str,
-		default="dataset",
-		help="Where the dataset is stored.",
+		default='dataset',
+		help='Where the dataset is stored.',
 	)
 	parser.add_argument(
-		"--output_dir",
+		'--output_dir',
 		type=str,
-		default="outputs",
-		help="Where to store the final model.",
+		default='outputs',
+		help='Where to store the final model.',
 	)
 	parser.add_argument(
-		"--pretrained_model_name",
+		'--pretrained_model_name',
 		type=str,
-		default="microsoft/resnet-18",
-		help="Name of pretrained model to be used.",
+		default='microsoft/resnet-18',
+		help='Name of pretrained model to be used.',
 	)
 	parser.add_argument(
-		"--dataset_dir",
+		'--dataset_dir',
 		type=str,
-		default="dataset",
-		help="Directory where the dataset is stored.",
+		default='dataset',
+		help='Directory where the dataset is stored.',
 	)
 	parser.add_argument(
-		"--test_for_val",
+		'--test_for_val',
 		default=False,
-		action="store_true",
-		help="Use the test set for validation. By default, a subset of training data is used.",
+		action='store_true',
+		help='Use the test set for validation. By default, a subset of training data is used.',
 	)
 	parser.add_argument(
-		"--test_type",
+		'--test_type',
 		type=str,
-		default="public_test",
-		help="The testing data split type to use.",
-		choices=["public_test", "private_test"],
+		default='public_test',
+		help='The testing data split type to use.',
+		choices=['public_test', 'private_test'],
 	)
 	parser.add_argument(
-		"--train_val_size",
+		'--train_val_size',
 		type=int,
 		default=None,
-		help="Combined size (# samples) of the training and validation set.",
+		help='Combined size (# samples) of the training and validation set.',
 	)
 	parser.add_argument(
-		"--test_size",
+		'--test_size',
 		type=int,
 		default=None,
-		help="Size (# samples) of the test set.",
+		help='Size (# samples) of the test set.',
 	)
 	parser.add_argument(
-		"--percent_train",
+		'--percent_train',
 		type=float,
 		default=0.8,
-		help="Percentage of the data to use for training (train_val_size * percent_train).",
+		help='Percentage of the data to use for training (train_val_size * percent_train).',
 	)
 	parser.add_argument(
-		"--debug",
+		'--debug',
 		default=False,
-		action="store_true",
-		help="Whether to use a small subset of the dataset for debugging.",
+		action='store_true',
+		help='Whether to use a small subset of the dataset for debugging.',
 	)
 
 	# Training arguments
 	parser.add_argument(
-		"--device",
-		default="cuda" if torch.cuda.is_available() else "cpu",
-		help="Device (cuda or cpu) on which the code should run",
+		'--device',
+		default='cuda' if torch.cuda.is_available() else 'cpu',
+		help='Device (cuda or cpu) on which the code should run',
 	)
 	parser.add_argument(
-		"--batch_size",
+		'--batch_size',
 		type=int,
 		default=128,
-		help="Batch size (per device) for the training dataloader.",
+		help='Batch size (per device) for the training dataloader.',
 	)
 	parser.add_argument(
-		"--learning_rate",
+		'--learning_rate',
 		type=float,
 		default=5e-4,
-		help="Initial learning rate (after the potential warmup period) to use.",
+		help='Initial learning rate (after the potential warmup period) to use.',
 	)
 	parser.add_argument(
-		"--weight_decay",
+		'--weight_decay',
 		type=float,
 		default=0.0,
-		help="Weight decay to use.",
+		help='Weight decay to use.',
 	)
 	parser.add_argument(
-		"--num_train_epochs",
+		'--num_train_epochs',
 		type=int,
 		default=15,
-		help="Total number of training epochs to perform.",
+		help='Total number of training epochs to perform.',
 	)
 	parser.add_argument(
-		"--eval_every_steps",
+		'--eval_every_steps',
 		type=int,
 		default=40,
-		help="Perform evaluation every n network updates.",
+		help='Perform evaluation every n network updates.',
 	)
 	parser.add_argument(
-		"--logging_steps",
+		'--logging_steps',
 		type=int,
 		default=20,
-		help="Compute and log training batch metrics every n steps.",
+		help='Compute and log training batch metrics every n steps.',
 	)
 	parser.add_argument(
-		"--checkpoint_every_steps",
+		'--checkpoint_every_steps',
 		type=int,
 		default=500,
-		help="Save model checkpoint every n steps.",
+		help='Save model checkpoint every n steps.',
 	)
 	parser.add_argument(
-		"--max_train_steps",
+		'--max_train_steps',
 		type=int,
 		default=None,
-		help="Total number of training steps to perform. If provided, overrides num_train_epochs.",
+		help='Total number of training steps to perform. If provided, overrides num_train_epochs.',
 	)
 	parser.add_argument(
-		"--lr_scheduler_type",
+		'--lr_scheduler_type',
 		type=str,
-		default="linear",
-		help="The scheduler type to use.",
-		choices=["no_scheduler", "linear", "cosine", "cosine_with_restarts", "polynomial", "constant", "constant_with_warmup"],
+		default='linear',
+		help='The scheduler type to use.',
+		choices=['no_scheduler', 'linear', 'cosine', 'cosine_with_restarts', 'polynomial', 'constant', 'constant_with_warmup'],
 	)
 	parser.add_argument(
-		"--num_warmup_steps", type=int, default=0, help="Number of steps for the warmup in the lr scheduler."
+		'--num_warmup_steps',
+		type=int,
+		default=0,
+		help='Number of steps for the warmup in the lr scheduler.',
 	)
 	parser.add_argument(
-		"--seed",
+		'--seed',
 		type=int,
 		default=42,
-		help="A seed for reproducible training.",
+		help='A seed for reproducible training.',
 	)
 	
 	# Weights and biases (wandb) arguments
 	parser.add_argument(
-		"--use_wandb",
+		'--use_wandb',
 		default=False,
-		action="store_true",
-		help="Whether to enable usage/logging for the wandb_project.",
+		action='store_true',
+		help='Whether to enable usage/logging for the wandb_project.',
 	)
 	parser.add_argument(
-		"--wandb_project", 
-		default="emotion_detection",
-		help="wandb project name to log metrics to"
+		'--wandb_project', 
+		default='emotion_detection',
+		help='wandb project name to log metrics to'
+	)
+
+	# Live demo arguments
+	parser.add_argument(
+		'--demo_cascade_file',
+		type=str,
+		default=os.path.join('.', 'haarcascade_frontalface_default.xml'),
+		help='The cascade file to use for facial detection in the demo.'
+	)
+	parser.add_argument(
+		'--demo_window_height',
+		type=int,
+		default=720,
+		help='The height (in pixels) of the live demo window.',
+	)
+	parser.add_argument(
+		'--demo_window_width',
+		type=int,
+		default=480,
+		help='The width (in pixels) of the live demo window.',
+	)
+	parser.add_argument(
+		'--demo_video_height',
+		type=int,
+		default=425,
+		help='The height (in pixels) of the live demo video.',
+	)
+	parser.add_argument(
+		'--demo_video_width',
+		type=int,
+		default=425,
+		help='The width (in pixels) of the live demo video.',
+	)
+	parser.add_argument(
+		'--demo_font_type',
+		type=str,
+		default='monospace',
+		help='The type of font to use throughout the demo.',
+	)
+	parser.add_argument(
+		'--demo_font_size',
+		type=int,
+		default=15,
+		help='The font size to use throughout the demo.',
 	)
 
 	args = parser.parse_args()
