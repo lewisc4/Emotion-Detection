@@ -181,28 +181,28 @@ def parse_args():
 		help='The cascade file to use for facial detection in the demo.'
 	)
 	parser.add_argument(
-		'--demo_window_height',
-		type=int,
-		default=720,
-		help='The height (in pixels) of the live demo window.',
-	)
-	parser.add_argument(
 		'--demo_window_width',
 		type=int,
-		default=480,
+		default=720,
 		help='The width (in pixels) of the live demo window.',
 	)
 	parser.add_argument(
-		'--demo_video_height',
+		'--demo_window_height',
 		type=int,
-		default=425,
-		help='The height (in pixels) of the live demo video.',
+		default=480,
+		help='The height (in pixels) of the live demo window.',
 	)
 	parser.add_argument(
 		'--demo_video_width',
 		type=int,
 		default=425,
 		help='The width (in pixels) of the live demo video.',
+	)
+	parser.add_argument(
+		'--demo_video_height',
+		type=int,
+		default=425,
+		help='The height (in pixels) of the live demo video.',
 	)
 	parser.add_argument(
 		'--demo_font_type',

@@ -227,8 +227,8 @@ def main(args):
 		device=args.device,
 	)
 	emotion_detector.run(
-		window_dims=(args.demo_window_height, args.demo_window_width),
-		video_dims=(args.demo_video_height, args.demo_video_width),
+		window_dims=(args.demo_window_width, args.demo_window_height),
+		video_dims=(args.demo_video_width, args.demo_video_height),
 		font_type=args.demo_font_type,
 		font_size=args.demo_font_size,
 	)
