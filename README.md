@@ -3,6 +3,8 @@
 ## Project Overview
 In this project, a pre-trained [ResNet model](https://arxiv.org/pdf/1512.03385.pdf) (specifically [this implementation](https://huggingface.co/microsoft/resnet-18)), was fine-tuned on the [FER-2013 dataset](https://www.kaggle.com/datasets/msambare/fer2013) to classify 7 human emotions based on images of human faces. It is shown that this fine-tuned model achieves higher accuracies than several baseline models as well as a higher accuracy than human evaluations. The training results and metrics for this project were primarily tracked using [wandb](https://wandb.ai/site) and all associated training runs can be found [here](https://wandb.ai/clewis7744/emotion_detection), with the best training run being [here](https://wandb.ai/clewis7744/emotion_detection/runs/3jct8bsf).
 
+A live (webcam) demo can be run using a trained model, detailed in the [**Live Demo**](https://github.com/lewisc4/Emotion-Detection/blob/main/README.md#live-demo) section.
+
 ## Environment Setup
 ### Package Installation
 It is necessary to have python >= 3.7 installed in order to run the code for this project. In order to install the necessary libraries and modules follow the below instructions.
@@ -53,3 +55,19 @@ The available hyperparameters for fine-tuning the ResNet model can be found in [
 **To perform wandb sweeps using the [`sweep.yaml`](/cli/sweep.yaml) configuration (you must set a wandb project via the `wandb_project` argument):**
 1. `wandb sweep --project emotion_detection sweep.yaml` <- Here `emotion_detection` is the wandb project name
 2. `wandb agent wandb_username/emotion_detection/sweep_id` <- Use the `sweep_id` returned by the above command
+
+## Live Demo
+The [`webcam_demo.py`](https://github.com/lewisc4/Emotion-Detection/blob/main/cli/webcam_demo.py) file is used to demonstrate a trained FER model using a webcam as live input. It assumes the saved model was a [ResNetForImageClassification](https://huggingface.co/docs/transformers/v4.29.1/en/model_doc/resnet#transformers.ResNetForImageClassification) model and is loaded via the [from_pretrained()](https://huggingface.co/docs/transformers/v4.29.1/en/main_classes/model#transformers.PreTrainedModel.from_pretrained) method, although this can easily be changed for other model types.
+
+### Parameters
+The available CLI parameters for running the FER/emotion detection demo can be found in [`utils.py`](/emotion_detection/utils.py#L176).
+
+* `data_dir` <- Folder where the FER dataset is stored, primarily for class labels (`cli/dataset/` by default, see [**Downloading The Dataset**](https://github.com/lewisc4/Emotion-Detection/blob/main/README.md#downloading-the-dataset))
+* `output_dir` <- Where to load the [ResNetForImageClassification](https://huggingface.co/docs/transformers/v4.29.1/en/model_doc/resnet#transformers.ResNetForImageClassification) model from
+* `demo_cascade_file` <- The [cascade](https://github.com/kipr/opencv/tree/master/data/haarcascades) `.xml` file to use for facial **detection** ([`cli/haarcascade_frontalface_default.xml`](https://github.com/lewisc4/Emotion-Detection/blob/main/cli/haarcascade_frontalface_default.xml) by default)
+* `demo_window_width` <- The demo window's width (in pixels, 720 by default)
+* `demo_window_height` <- The demo window's height (in pixels, 480 by default)
+
+### Example Usage
+**To run the live demo with default arguments:**
+- `python3 demo.py`
